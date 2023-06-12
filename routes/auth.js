@@ -1,6 +1,8 @@
 const express = require('express');
-const router = express.Router();
+const passport = require('passport');
 const bcrypt = require('bcrypt');
+const router = express.Router();
+
 
 const User = require('../models/User');
 
@@ -9,30 +11,33 @@ router.get('/register', (req, res) => {
   res.render('register');
 });
 
-router.post('/register', async (req, res) => {
-  try {
-    const { username, password } = req.body;
+router.post('/register', async (req, res, next) => {
+  const { name, email, password } = req.body;
 
-    // Verificar si el usuario ya existe en la base de datos
-    const existingUser = await User.findOne({ username });
+  try {
+    // Verificar si el usuario ya existe en la base de datos por su correo electrónico
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.render('register', { error: 'El usuario ya existe' });
+      // El usuario ya está registrado
+      return res.redirect('/auth/register');
     }
 
     // Generar el hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear un nuevo usuario en la base de datos
+    // Crear un nuevo usuario con el hash de la contraseña
     const newUser = new User({
-      username,
+      name,
+      email,
       password: hashedPassword
     });
+
+    // Guardar el nuevo usuario en la base de datos
     await newUser.save();
 
     res.redirect('/auth/login');
   } catch (error) {
-    console.error(error);
-    res.render('register', { error: 'Error en el registro' });
+    next(error);
   }
 });
 
@@ -41,41 +46,21 @@ router.get('/login', (req, res) => {
   res.render('login');
 });
 
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
+// Ruta para el inicio de sesión con GitHub
+router.get('/github', passport.authenticate('github'));
 
-    // Buscar al usuario en la base de datos
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.render('login', { error: 'Credenciales inválidas' });
-    }
-
-    // Verificar la contraseña
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.render('login', { error: 'Credenciales inválidas' });
-    }
-
-    // Guardar los datos del usuario en la sesión
-    req.session.user = {
-      id: user._id,
-      username: user.username,
-      role: user.role
-    };
-
-    res.redirect('/products');
-  } catch (error) {
-    console.error(error);
-    res.render('login', { error: 'Error en el inicio de sesión' });
+// Ruta para el callback de GitHub después del inicio de sesión
+router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/auth/login' }),
+  (req, res) => {
+    // Lógica para redirigir o mostrar información después del inicio de sesión exitoso con GitHub
+    res.redirect('/'); // Por ejemplo, redirige al inicio de tu aplicación
   }
-});
+);
 
-// Ruta de cierre de sesión
-router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/auth/login');
-});
+router.post('/login', passport.authenticate('local', {
+  successRedirect: '/dashboard',
+  failureRedirect: '/auth/login',
+  failureFlash: true
+}));
 
 module.exports = router;
-
