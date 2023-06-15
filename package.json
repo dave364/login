@@ -9,44 +9,28 @@
   "main": "index.js",
 
   "scripts": {
-
-    "start": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
 
   },
-
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
   "dependencies": {
-
     "bcrypt": "^5.1.0",
-
-    "connect-mongo": "^4.6.0",
-
-    "exphbs": "^1.2.0",
-
-    "express": "^4.17.1",
-
-    "express-handlebars": "^5.3.5",
-
+    "connect-mongo": "^5.0.0",
+    "connect-mongodb-session": "^3.1.1",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.7",
     "express-session": "^1.17.3",
-
-    "mongoose": "^7.2.2",
-
-    "mongoose-session-store": "^0.0.3",
-
+    "mongoose": "^7.1.1",
+    "mongoose-paginate-v2": "^1.7.1",
+    "mongose": "^0.0.2-security",
     "passport": "^0.6.0",
-
-    "passport-github": "^1.1.0",
-
     "passport-github2": "^0.1.12",
-
-    "passport-local": "^1.0.0"
-
-  },
-
-  "devDependencies": {
-
-    "@types/express-handlebars": "^6.0.0"
-
+    "passport-local": "^1.0.0",
+    "session-file-store": "^1.5.0",
+    "socket.io": "^4.6.1"
   }
-
 }
 
