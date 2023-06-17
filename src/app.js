@@ -52,13 +52,13 @@ initializePassport();
 
 // Middleware para redirección
 app.use((req, res, next) => {
-    if (req.url === '/' || req.url === '/index.html') {
-      res.redirect('/login');
-    } else {
-      next();
-    }
-  });
-  
+  if (req.url === '/' || req.url === '/index.html') {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+});
+
 //app.use('/',viewsRouter)                                  los comento pq son los de file system
 //app.use('/realtimeproducts',viewsRouter)
 app.use('/',viewsRouterMongo)
@@ -69,6 +69,27 @@ app.use('/api/carts', cartsMongoRouter)
 app.use('/api/sessions',sessionsRouter);
 
 const io = new Server(server);
+
+/* io.on ('connection',async socket=>{                              lo comento pq es el de file System
+    console.log("Nuevo socket conectado")
+    const prod = await productos.getProducts()
+    socket.emit('productos',prod);
+    
+    socket.on('delete',async data=>{
+        const mensaje = await productos.deleteProduct(data);
+        socket.emit('dataEvent',mensaje)
+        const prod = await productos.getProducts()
+        socket.emit('productos',prod);
+    })
+
+    socket.on('addProduct',async data=>{
+        const mensaje = await productos.addProduct(data)
+        socket.emit('dataEvent',mensaje)
+        const prod = await productos.getProducts()
+        socket.emit('productos',prod);        
+    })
+
+}) */ 
 
 
 io.on ('connection',async socket=>{                     /*estos son los de mongo */ 

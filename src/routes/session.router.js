@@ -66,7 +66,7 @@ router.get('/githubcallback',passport.authenticate('github'),(req,res)=>{
         email:user.email
     }
 
-    res.send({status:"success",message:"logeado , pero con github"})
+    res.redirect('/products');
 })
 
 
